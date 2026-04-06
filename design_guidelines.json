@@ -1,0 +1,151 @@
+{
+  "theme_and_archetype": {
+    "domain": "Data Analytics & Dashboard",
+    "theme": "Dark Mode Default (Light Mode Supported)",
+    "archetype": "Archetype 4 (Swiss & High-Contrast) tailored for Linear-style precision",
+    "vibe": "Professional, authoritative, data-focused, crisp, modular.",
+    "emotional_tone": "Trust, clarity, and elite operational focus."
+  },
+  "typography": {
+    "fonts": {
+      "headings": "Manrope",
+      "body": "IBM Plex Sans",
+      "monospace": "JetBrains Mono"
+    },
+    "scales": {
+      "h1": "text-4xl md:text-5xl font-extrabold tracking-tighter",
+      "h2": "text-2xl md:text-3xl font-bold tracking-tight",
+      "h3": "text-xl font-semibold tracking-tight",
+      "h4": "text-lg font-semibold tracking-tight",
+      "body": "text-sm md:text-base leading-relaxed",
+      "small_labels": "text-xs font-medium uppercase tracking-[0.15em]"
+    },
+    "rules": [
+      "Headings must use Manrope with negative letter spacing (tracking-tight) to evoke the crispness of SaaS platforms like Linear.",
+      "Data tables, tooltips, and file metadata should use IBM Plex Sans for maximum legibility of dense information.",
+      "Code blocks, file formats (CSV, JSON), and numeric KPIs should use JetBrains Mono.",
+      "Never use Inter."
+    ]
+  },
+  "colors": {
+    "dark_mode": {
+      "background": {
+        "app": "#090C15",
+        "surface": "#101623",
+        "surface_hover": "#171F32"
+      },
+      "border": {
+        "default": "#1E293B",
+        "focus": "#4F46E5",
+        "active": "#3B4863"
+      },
+      "text": {
+        "primary": "#F8FAFC",
+        "secondary": "#94A3B8",
+        "muted": "#64748B"
+      },
+      "brand": {
+        "primary": "#4F46E5",
+        "primary_hover": "#4338CA",
+        "glow": "rgba(79, 70, 229, 0.3)"
+      }
+    },
+    "light_mode": {
+      "background": {
+        "app": "#FAFAFA",
+        "surface": "#FFFFFF",
+        "surface_hover": "#F4F4F5"
+      },
+      "border": {
+        "default": "#E4E4E7",
+        "focus": "#4F46E5",
+        "active": "#D4D4D8"
+      },
+      "text": {
+        "primary": "#09090B",
+        "secondary": "#52525B",
+        "muted": "#A1A1AA"
+      },
+      "brand": {
+        "primary": "#4F46E5",
+        "primary_hover": "#4338CA",
+        "glow": "rgba(79, 70, 229, 0.15)"
+      }
+    },
+    "semantic": {
+      "success": "#10B981",
+      "success_bg": "rgba(16, 185, 129, 0.1)",
+      "warning": "#F59E0B",
+      "warning_bg": "rgba(245, 158, 11, 0.1)",
+      "danger": "#EF4444",
+      "danger_bg": "rgba(239, 68, 68, 0.1)"
+    },
+    "rules": [
+      "The UI should feel mostly monochromatic (indigo-tinted greys) to let the semantic colors (Red/Yellow/Green) instantly highlight data quality alerts.",
+      "Avoid muddy greys; all neutral tones have a slight blue/indigo hue.",
+      "Gradients are strictly prohibited for backgrounds. Use solid colors with 1px borders."
+    ]
+  },
+  "layout_spacing": {
+    "grid_system": "The Control Room (Mode B)",
+    "rules": [
+      "Use strict, dense bento grid layouts for the dashboard: grid-cols-1 md:grid-cols-3 lg:grid-cols-4 with gap-4 or gap-6.",
+      "Sidebar width should be fixed at 260px on desktop.",
+      "Containers must have internal padding of at least p-6 to avoid data feeling claustrophobic.",
+      "All card corners should have rounded-lg or rounded-xl (not fully pill-shaped).",
+      "Never center dashboard content; left-align everything for scannability."
+    ]
+  },
+  "components_customization": {
+    "cards": {
+      "style": "Flat background, sharp 1px border. No drop shadows. Use border-[#1E293B] (dark mode) and border-[#E4E4E7] (light mode).",
+      "hover": "Subtle background shift (bg-[#171F32]) and border brighten, rather than floating animations."
+    },
+    "upload_dropzone": {
+      "style": "Large interactive area. border-2 border-dashed border-[#1E293B]. When dragged over, the border shifts to border-indigo-500 and the background gets a subtle indigo tint (bg-[#4F46E5]/10).",
+      "typography": "Include a massive, clear call-to-action in Manrope, e.g., 'Drop your dataset here (CSV, JSON, Parquet)'."
+    },
+    "progress_bar": {
+      "style": "Height: 4px. Background: bg-indigo-500. Add an animated generic shine or glow using Framer Motion to simulate deep data processing."
+    },
+    "buttons": {
+      "primary": "bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-md transition-colors",
+      "secondary": "bg-transparent border border-[#1E293B] hover:border-indigo-500 text-primary transition-colors",
+      "danger": "bg-red-500/10 text-red-500 hover:bg-red-500/20"
+    },
+    "alerts": {
+      "style": "Traffic light icons (Phosphor) aligned horizontally. Green (Clean), Yellow (Missing values), Red (Critical duplicates/outliers). Use subtle background tints for the alert boxes (e.g., bg-red-500/10)."
+    },
+    "recharts": {
+      "style": "Colors must match the semantic or brand palette. No default Recharts colors. Remove chart background grid lines or make them extremely faint (strokeOpacity={0.1}). Tooltips must use the customized card style (dark background, sharp borders)."
+    }
+  },
+  "motion_and_interactions": {
+    "rules": [
+      "Fast, snappy transitions. transition-all duration-200 ease-in-out for hover states.",
+      "Collapsible sections (Accordions) should slide smoothly using Framer Motion.",
+      "The dashboard should reveal widgets with a staggered entrance animation (framer-motion delay) upon completing the data analysis.",
+      "No bounce or elastic easing; use linear or ease-out for a technical feel."
+    ]
+  },
+  "icons_and_assets": {
+    "icon_library": "@phosphor-icons/react",
+    "icon_style": "weight='regular' for standard icons, weight='fill' for active sidebar states or colored alerts.",
+    "images": {
+      "user_avatar": {
+        "url": "https://images.unsplash.com/photo-1581841064838-a470c740e8ee?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAzNTl8MHwxfHNlYXJjaHwxfHxwcm9mZXNzaW9uYWwlMjBhdmF0YXIlMjBwb3J0cmFpdHxlbnwwfHx8fDE3NzU0MjIxNzB8MA&ixlib=rb-4.1.0&q=85",
+        "description": "Professional avatar for the Google Auth user profile display."
+      }
+    }
+  },
+  "instructions_to_main_agent": [
+    "Install and use the @phosphor-icons/react library for all iconography. Use the 'fill' weight for traffic light alerts.",
+    "Implement the layout with a fixed Sidebar (Navigation) and a main scrollable content area.",
+    "Use Shadcn UI extensively but heavily override the default Vercel aesthetic. Remove shadows and enforce the 1px sharp border style.",
+    "The File Upload component must support Drag & Drop natively and transition gracefully into the 'Analyzing' state with a progress bar, then reveal the Dashboard.",
+    "For Recharts, ensure the stroke and fill colors are dynamically reading from Tailwind config or explicitly set to our indigo, green, yellow, and red palette.",
+    "Ensure all data tables (missing data, duplicates) are dense, with no unnecessary padding, simulating an advanced terminal or control room.",
+    "Implement light and dark mode toggling using next-themes or equivalent, defaulting to dark mode.",
+    "All interactive elements MUST have a data-testid attribute in kebab-case (e.g., data-testid='upload-dropzone', data-testid='export-pdf-button')."
+  ]
+}
