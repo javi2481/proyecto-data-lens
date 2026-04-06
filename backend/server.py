@@ -328,6 +328,126 @@ import pandas as pd
 import io
 import numpy as np
 
+def transform_ydata_profile(raw_profile: dict, content: bytes, file_type: str) -> Dict[str, Any]:
+    """Transform ydata-profiling JSON output to our dashboard format"""
+    try:
+        # Parse file for sample data
+        if file_type == 'csv':
+            df = pd.read_csv(io.BytesIO(content))
+        elif file_type in ['xlsx', 'xls']:
+            df = pd.read_excel(io.BytesIO(content))
+        elif file_type == 'json':
+            df = pd.read_json(io.BytesIO(content))
+        else:
+            df = pd.read_csv(io.BytesIO(content))
+        
+        # Extract table stats
+        table = raw_profile.get("table", {})
+        variables_raw = raw_profile.get("variables", {})
+        correlations_raw = raw_profile.get("correlations", {})
+        alerts_raw = raw_profile.get("alerts", [])
+        
+        # Build overview
+        overview = {
+            "n_rows": table.get("n", 0),
+            "n_columns": table.get("n_var", 0),
+            "n_cells": table.get("n", 0) * table.get("n_var", 0),
+            "n_missing": table.get("n_cells_missing", 0),
+            "missing_percent": round(table.get("p_cells_missing", 0) * 100, 2),
+            "n_duplicates": table.get("n_duplicates", 0),
+            "duplicate_percent": round(table.get("p_duplicates", 0) * 100, 2),
+            "memory_size_bytes": table.get("memory_size", 0),
+            "column_types": table.get("types", {})
+        }
+        
+        # Build variables
+        variables = {}
+        for name, var in variables_raw.items():
+            var_info = {
+                "name": name,
+                "type": var.get("type", "Unknown"),
+                "n_missing": var.get("n_missing", 0),
+                "missing_percent": round(var.get("p_missing", 0) * 100, 2),
+                "n_unique": var.get("n_distinct", 0),
+                "unique_percent": round(var.get("p_distinct", 0) * 100, 2)
+            }
+            
+            if var.get("type") == "Numeric":
+                var_info["is_numeric"] = True
+                var_info["mean"] = var.get("mean")
+                var_info["std"] = var.get("std")
+                var_info["min"] = var.get("min")
+                var_info["max"] = var.get("max")
+                var_info["median"] = var.get("median")
+                var_info["q1"] = var.get("25%")
+                var_info["q3"] = var.get("75%")
+                var_info["skewness"] = var.get("skewness")
+                var_info["kurtosis"] = var.get("kurtosis")
+                if var.get("histogram"):
+                    var_info["histogram"] = var["histogram"]
+            else:
+                var_info["is_numeric"] = False
+                if var.get("value_counts_without_nan"):
+                    top_values = list(var["value_counts_without_nan"].items())[:10]
+                    var_info["top_values"] = [{"value": str(k), "count": int(v)} for k, v in top_values]
+            
+            variables[name] = var_info
+        
+        # Build correlations
+        correlations = {}
+        if correlations_raw.get("pearson"):
+            pearson = correlations_raw["pearson"]
+            # ydata-profiling returns list of lists or dict
+            if isinstance(pearson, list):
+                # Find numeric columns from variables
+                numeric_cols = [name for name, var in variables.items() if var.get("is_numeric")]
+                if len(pearson) > 0 and len(pearson) == len(numeric_cols):
+                    correlations["pearson"] = {"columns": numeric_cols, "matrix": pearson}
+            elif isinstance(pearson, dict):
+                cols = list(pearson.keys())
+                matrix = [[pearson.get(c1, {}).get(c2, 0) for c2 in cols] for c1 in cols]
+                correlations["pearson"] = {"columns": cols, "matrix": matrix}
+        
+        # Build alerts
+        alerts = []
+        for alert in alerts_raw:
+            if isinstance(alert, str):
+                # ydata-profiling returns strings
+                alert_type = "warning"
+                if "missing" in alert.lower() or "constant" in alert.lower():
+                    alert_type = "danger"
+                # Extract column name from format "[column] message"
+                column = None
+                if alert.startswith("[") and "]" in alert:
+                    column = alert[1:alert.index("]")]
+                alerts.append({
+                    "type": alert_type,
+                    "column": column,
+                    "message": alert,
+                    "category": "correlation" if "correlated" in alert.lower() else "quality"
+                })
+            elif isinstance(alert, dict):
+                alert_type = "warning"
+                if "missing" in alert.get("alert_type", "").lower():
+                    alert_type = "danger" if alert.get("values", {}).get("p_missing", 0) > 0.5 else "warning"
+                alerts.append({
+                    "type": alert_type,
+                    "column": alert.get("column_name"),
+                    "message": alert.get("alert_type", ""),
+                    "category": alert.get("alert_type", "").split("_")[0].lower() if alert.get("alert_type") else "unknown"
+                })
+        
+        return {
+            "overview": overview,
+            "variables": variables,
+            "correlations": correlations,
+            "alerts": alerts,
+            "sample_data": df.head(5).fillna("").to_dict(orient="records")
+        }
+    except Exception as e:
+        logger.error(f"Transform failed: {e}")
+        raise
+
 def generate_mock_profile(content: bytes, file_type: str) -> Dict[str, Any]:
     """Generate mock profiling data - will be replaced by ydata-profiling service"""
     try:
@@ -465,8 +585,22 @@ async def analyze_report(report_id: str, user: User = Depends(get_current_user))
         # Get file from storage
         content, _ = get_object(report["storage_path"])
         
-        # Generate profile (mock for now)
-        profile_data = generate_mock_profile(content, report["file_type"])
+        # Use Railway ydata-profiling service if available, else fallback to local
+        profile_data = None
+        if PROFILING_SERVICE_URL:
+            try:
+                files = {"file": (report["filename"], content)}
+                resp = requests.post(f"{PROFILING_SERVICE_URL}/profile", files=files, timeout=120)
+                resp.raise_for_status()
+                raw_profile = resp.json()
+                # Transform ydata-profiling output to our format
+                profile_data = transform_ydata_profile(raw_profile, content, report["file_type"])
+                logger.info("Used Railway ydata-profiling service")
+            except Exception as e:
+                logger.warning(f"Railway service failed, using local: {e}")
+        
+        if not profile_data:
+            profile_data = generate_mock_profile(content, report["file_type"])
         
         # Update report
         await db.reports.update_one(
