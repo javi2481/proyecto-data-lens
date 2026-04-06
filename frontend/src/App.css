@@ -1,34 +1,146 @@
-.App-logo {
-    height: 40vmin;
-    pointer-events: none;
+/* DataLens App Styles */
+
+/* Sidebar */
+.sidebar {
+    width: 260px;
+    min-width: 260px;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-    .App-logo {
-        animation: App-logo-spin infinite 20s linear;
+/* Dashboard grid */
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(1, 1fr);
+    gap: 1.5rem;
+}
+
+@media (min-width: 768px) {
+    .dashboard-grid {
+        grid-template-columns: repeat(2, 1fr);
     }
 }
 
-.App-header {
-    background-color: #0f0f10;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    font-size: calc(10px + 2vmin);
-    color: white;
-}
-
-.App-link {
-    color: #61dafb;
-}
-
-@keyframes App-logo-spin {
-    from {
-        transform: rotate(0deg);
-    }
-    to {
-        transform: rotate(360deg);
+@media (min-width: 1024px) {
+    .dashboard-grid {
+        grid-template-columns: repeat(3, 1fr);
     }
 }
+
+@media (min-width: 1280px) {
+    .dashboard-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+/* Metric cards */
+.metric-card {
+    @apply bg-card border border-border rounded-lg p-6 transition-all duration-200;
+}
+
+.metric-card:hover {
+    @apply border-primary/40;
+}
+
+/* Chart container */
+.chart-container {
+    @apply bg-card border border-border rounded-lg p-4;
+}
+
+/* Progress bar animation */
+.progress-bar-animated {
+    position: relative;
+    overflow: hidden;
+}
+
+.progress-bar-animated::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+    animation: shimmer 1.5s ease-in-out infinite;
+}
+
+/* Table styles */
+.data-table {
+    @apply w-full text-sm;
+}
+
+.data-table th {
+    @apply text-left font-semibold text-muted-foreground uppercase text-xs tracking-wider py-3 px-4 border-b border-border;
+}
+
+.data-table td {
+    @apply py-3 px-4 border-b border-border;
+}
+
+.data-table tr:hover td {
+    @apply bg-muted/50;
+}
+
+/* Tooltip custom styles for Recharts */
+.recharts-tooltip-wrapper {
+    z-index: 100;
+}
+
+.custom-tooltip {
+    @apply bg-card border border-border rounded-lg p-3 shadow-lg;
+}
+
+/* Alert badges */
+.alert-badge {
+    @apply inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium;
+}
+
+/* Collapsible section */
+.collapsible-section {
+    @apply border border-border rounded-lg overflow-hidden;
+}
+
+.collapsible-header {
+    @apply flex items-center justify-between p-4 cursor-pointer hover:bg-muted/50 transition-colors;
+}
+
+.collapsible-content {
+    @apply p-4 border-t border-border;
+}
+
+/* File type badges */
+.file-badge {
+    @apply inline-flex items-center px-2 py-0.5 rounded text-xs font-mono font-medium;
+}
+
+.file-badge-csv { @apply bg-emerald-500/10 text-emerald-500; }
+.file-badge-xlsx, .file-badge-xls { @apply bg-green-500/10 text-green-500; }
+.file-badge-json { @apply bg-amber-500/10 text-amber-500; }
+.file-badge-parquet { @apply bg-purple-500/10 text-purple-500; }
+
+/* Plan badges */
+.plan-badge-free { @apply bg-muted text-muted-foreground; }
+.plan-badge-pro { @apply bg-primary/10 text-primary; }
+.plan-badge-team { @apply bg-amber-500/10 text-amber-500; }
+
+/* Loading skeleton */
+.skeleton {
+    @apply bg-muted rounded animate-pulse;
+}
+
+/* Empty state */
+.empty-state {
+    @apply flex flex-col items-center justify-center py-16 text-center;
+}
+
+.empty-state-icon {
+    @apply w-16 h-16 text-muted-foreground/50 mb-4;
+}
+
+/* Status indicators */
+.status-dot {
+    @apply w-2 h-2 rounded-full;
+}
+
+.status-dot-pending { @apply bg-amber-500; }
+.status-dot-processing { @apply bg-blue-500 animate-pulse; }
+.status-dot-completed { @apply bg-emerald-500; }
+.status-dot-failed { @apply bg-red-500; }
