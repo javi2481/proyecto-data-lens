@@ -39,6 +39,8 @@ DataLens es una plataforma web donde cualquier persona sube un archivo de datos 
 - [x] Public sharing with tokens
 - [x] Stripe checkout integration
 - [x] Plan limits enforcement
+- [x] PDF export with WeasyPrint
+- [x] Stripe Customer Portal for subscription management
 
 ### Frontend  
 - [x] Landing page with feature highlights
@@ -62,8 +64,8 @@ DataLens es una plataforma web donde cualquier persona sube un archivo de datos 
 
 ### P0 - Critical (Next Sprint)
 - [ ] Connect to real ydata-profiling service (Railway container)
-- [ ] PDF export implementation with WeasyPrint
-- [ ] Stripe webhook for subscription management
+- [x] PDF export implementation with WeasyPrint
+- [x] Stripe customer portal for subscription management
 
 ### P1 - High Priority
 - [ ] Real-time analysis progress updates (WebSocket)
