@@ -11,7 +11,8 @@ import {
   Zap, 
   ArrowLeft,
   FileBarChart,
-  Loader2
+  Loader2,
+  CreditCard
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -87,6 +88,21 @@ export const PricingPage = () => {
       window.location.href = response.data.url;
     } catch (error) {
       toast.error(error.response?.data?.detail || 'Error al procesar el pago');
+      setLoadingPlan(null);
+    }
+  };
+
+  const handleManageSubscription = async () => {
+    setLoadingPlan('manage');
+    try {
+      const response = await axios.post(
+        `${API}/billing/portal`,
+        { origin_url: window.location.origin },
+        { withCredentials: true }
+      );
+      window.location.href = response.data.url;
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'Error al abrir portal de facturación');
       setLoadingPlan(null);
     }
   };
@@ -198,8 +214,23 @@ export const PricingPage = () => {
           })}
         </div>
 
-        <div className="mt-12 text-center text-sm text-muted-foreground">
-          <p>
+        <div className="mt-12 text-center space-y-4">
+          {user?.plan !== 'free' && (
+            <Button 
+              variant="outline" 
+              onClick={handleManageSubscription}
+              disabled={loadingPlan === 'manage'}
+              data-testid="manage-subscription-btn"
+            >
+              {loadingPlan === 'manage' ? (
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              ) : (
+                <CreditCard className="w-4 h-4 mr-2" />
+              )}
+              {language === 'es' ? 'Gestionar suscripción' : 'Manage subscription'}
+            </Button>
+          )}
+          <p className="text-sm text-muted-foreground">
             {language === 'es'
               ? 'Todos los precios están en USD. Los pagos se procesan de forma segura a través de Stripe.'
               : 'All prices are in USD. Payments are securely processed through Stripe.'}

@@ -144,12 +144,31 @@ export const Dashboard = () => {
     }
   };
 
-  const handleExportPDF = () => {
+  const handleExportPDF = async () => {
     if (user?.plan === 'free') {
       toast.error('Exportar PDF es una función Pro. Actualiza tu plan.');
       return;
     }
-    toast.info('Exportación PDF próximamente disponible');
+    if (!currentReport?.report_id) return;
+    
+    try {
+      const response = await axios.get(`${API}/reports/${currentReport.report_id}/pdf`, {
+        withCredentials: true,
+        responseType: 'blob'
+      });
+      
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `datalens_${currentReport.filename.split('.')[0]}.pdf`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+      toast.success('PDF descargado');
+    } catch (error) {
+      toast.error('Error al generar PDF');
+    }
   };
 
   return (
